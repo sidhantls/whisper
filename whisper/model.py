@@ -162,6 +162,8 @@ class AudioEncoder(nn.Module):
                 self.encoder_out2 = x
             elif  idx == len(self.blocks) - 1:
                 self.encoder_out_last = x
+            elif idx == len(self.blocks)//2 + 2:
+                self.encoder_out_middle = x
 
         x = self.ln_post(x)
         return x
