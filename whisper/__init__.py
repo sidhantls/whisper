@@ -1,5 +1,6 @@
 import hashlib
 import io
+import warnings
 import os
 import urllib
 import warnings
@@ -161,6 +162,7 @@ def load_encoder_model(
     device: Optional[Union[str, torch.device]] = None,
     download_root: str = None,
     in_memory: bool = False,
+    load_weights=True
 ) -> Whisper:
     """
     Load a Whisper ASR model
@@ -175,6 +177,8 @@ def load_encoder_model(
         path to download the model files; by default, it uses "~/.cache/whisper"
     in_memory: bool
         whether to preload the model weights into host memory
+    load_weights: bool
+        Load pre-trained weights
     Returns
     -------
     model : Whisper
@@ -212,7 +216,11 @@ def load_encoder_model(
         if 'decoder' == key[:7]:
             del checkpoint["model_state_dict"][key]
 
-    model.load_state_dict(checkpoint["model_state_dict"])
+    if load_weights:
+        model.load_state_dict(checkpoint["model_state_dict"])
+    else:
+        warning_message = "load_weights set to False, not loading pre-trained weights from OpenAI Whisper"
+        warnings.warn(warning_message, UserWarning)
     if alignment_heads is not None:
         model.set_alignment_heads(alignment_heads)
 
