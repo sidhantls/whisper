@@ -36,7 +36,15 @@ def main(args):
     folder_path = Path(folder)
     files = list(folder_path.glob('*.mp3')) 
 
-    batch_duration = 5 
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+        model = model.cuda() 
+        print("CUDA is available. Using GPU.")
+    else:
+        device = torch.device("cpu")
+        print("CUDA is not available. Using CPU.")
+
+    batch_duration = args.batch_duration 
     dataset = [] 
 
     for path in tqdm(files, desc='transcribing files'):
@@ -54,6 +62,8 @@ if __name__ == "__main__":
     parser.add_argument('--model_name', type=str, default='tiny', help='Name of the model to use (default: tiny)')
     parser.add_argument('--folder', type=str, default='../videos', help='Folder containing audio files (default: ../videos)')
     parser.add_argument('--output_folder', type=str, default='output', help='Output folder to save transcriptions (default: output)')
+    parser.add_argument('--batch_duration', type=int, default=5, help='Transcribe in batches of n seconds')
+
     args = parser.parse_args()
     
     main(args)
